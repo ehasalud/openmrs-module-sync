@@ -13,9 +13,13 @@
  */
 package org.openmrs.module.sync.api.impl;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -703,17 +707,26 @@ public class SyncServiceImpl implements SyncService {
 	 * @see org.openmrs.module.sync.api.SyncService#execGeneratedFile(java.io.File)
 	 */
 	public void execGeneratedFile(File file) throws APIException {
-		AdministrationService adminService = Context.getAdministrationService();
+		//AdministrationService adminService = Context.getAdministrationService();
 		
 		// preserve this server's sync settings
-		List<GlobalProperty> syncGPs = adminService.getGlobalPropertiesByPrefix("sync.");
+		//List<GlobalProperty> syncGPs = adminService.getGlobalPropertiesByPrefix("sync.");
+		
+		getSynchronizationDAO().execSQL("CREATE TABLE global_property_backup AS SELECT * FROM global_property WHERE property LIKE 'sync.%';");
 		
 		getSynchronizationDAO().execGeneratedFile(file);
 		
+		getSynchronizationDAO().execSQL("UPDATE global_property ,global_property_backup " +
+				"SET global_property.property_value = global_property_backup.property_value " +
+				"WHERE global_property.property = global_property_backup.property;");
+		
+		getSynchronizationDAO().execSQL("DROP TABLE global_property_backup;");
+		
 		// save those GPs again
-		for (GlobalProperty gp : syncGPs) {
-			adminService.saveGlobalProperty(gp);
-		}
+		//adminService = Context.getAdministrationService();
+		//for (GlobalProperty gp : syncGPs) {
+		//	adminService.saveGlobalProperty(gp);
+		//}
 		
 		//Delete any data in sync record after import of the parent DB
 		for (SyncRecord record : this.getSynchronizationDAO().getSyncRecords()) {

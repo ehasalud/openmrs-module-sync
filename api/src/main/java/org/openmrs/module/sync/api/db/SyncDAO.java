@@ -426,6 +426,8 @@ public interface SyncDAO {
 	
 	public void generateDataFile(File outFile, String[] ignoreTables);
 	
+	public void execSQL(String sql);
+	
 	public void execGeneratedFile(File generatedDataFile);
 	
 	/**

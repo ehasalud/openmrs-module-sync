@@ -1131,6 +1131,25 @@ public class HibernateSyncDAO implements SyncDAO {
 		return out.toString();
 	}
 	
+	public void execSQL(String sql){
+		String[] props = getConnectionProperties();
+		String username = props[0];
+		String password = props[1];
+		String database = props[2];
+		String host = props[3];
+		String port = props[4];
+		
+		String[] commands = { "mysql", "-e", sql, "-f", "-u" + username, "-p" + password,
+				"-h" + host, "-P" + port, "-D" + database };
+		
+		String output;
+		output = execCmd(null, commands);
+		if (output != null && output.length() > 0) {
+			log.error("Exec call: " + Arrays.asList(commands));
+			log.error("Output of exec: " + output);
+		}
+	}
+	
 	public void execGeneratedFile(File generatedDataFile) {
 		// TODO this depends on mysql being on the path
 		// TODO fix this so that queries are parsed out and run linebyline?
