@@ -21,6 +21,10 @@
 		<point>org.openmrs.admin.list</point>
 		<class>@MODULE_PACKAGE@.web.extension.AdminList</class>
 	</extension>
+	<extension>
+		<point>org.openmrs.gutter.tools</point>
+		<class>@MODULE_PACKAGE@.web.extension.GutterListExt</class>
+	</extension>
 	
 	<!-- AOP -->
 	<advice>
